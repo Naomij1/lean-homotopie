@@ -27,7 +27,7 @@ set_option pp.beta true
 --Définitions par soustype d'un chemin et d'une boucle
 /-- Chemin sur un type X -/
 def path (X : Type) [topological_space X] := {f: I → X // continuous f} 
-/-- Boucle sur un type X -/
+/-- Lacet sur un type X -/
 def loop (X : Type) [topological_space X] := {f: I → X // continuous f ∧ f(0)=f(1)} 
 
 
@@ -39,7 +39,7 @@ def const_0_I : loop ℝ  := ⟨foo, by {split, assume h,  exact continuous_cons
 def loop_homotopy (X : Type) [topological_space X] (f : loop X) (g : loop X) : Prop := 
     ∃ (H : I × I -> X),  (∀ t, H(0,t) = f.val(t) ∧  H(1,t)=subtype.val g(t)) ∧ (continuous H) 
 
-/-- Compostition d'homotopies -/
+/-- Composition d'homotopies -/
 noncomputable def loop_comp (X : Type) [topological_space X] (f : loop X) (g : loop X) : loop X := 
     ⟨λ t, if t.val≤0.5 then f.val(⟨2*t, sorry⟩) else g.val (⟨ 2*t-1, sorry⟩), sorry⟩
 
@@ -129,6 +129,7 @@ def is_homotopy (X : Type) [topological_space X] (f : X -> X) (g : X -> X) (H : 
          
 def const_0: ℝ -> ℝ  := λ x, 0
 
+/-- Espace contractible -/
 class contractible_space (X : Type) [topological_space X] :=
     (H : X × I → X)
     (const : X)
@@ -145,6 +146,7 @@ begin
 end
 
 
+/-- ℝ est contractible -/
 theorem contractible_R : is_homotopy ℝ const_0 id H := 
 begin
     split,
