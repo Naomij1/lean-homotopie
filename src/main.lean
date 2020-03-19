@@ -55,7 +55,6 @@ noncomputable def loop_comp (f : loop X) (g : loop X) : loop X :=
 def loop_inv (f : loop X) : loop X := ⟨λ x:I, f.val(⟨1-x.val, oneminus x⟩ ), 
         and.intro (continuous.comp f.property.left oneminuscont) (by { simp [f.property.right], sorry })        ⟩
 
-#check subtype
 
 /-- L'homotopie est reflexive -/
 theorem loop_homotopy_refl : reflexive (loop_homotopy X) :=
