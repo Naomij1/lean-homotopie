@@ -4,7 +4,7 @@ import topology.instances.real
 import tactic.suggest
 
 open set 
-
+open classical
 --  Propriétés de base sur l'ensemble [0,1]
 
 abbreviation I := Icc (0 : ℝ) (1 : ℝ)
@@ -32,13 +32,20 @@ begin
   exact t.property.1,
 end
 
-lemma oneminuscont : continuous (λ t:I, (⟨1-t, oneminus t⟩:I)) := sorry
+lemma oneminuscont : continuous (λ t:I, (⟨1-t, oneminus t⟩:I)) := 
+begin
+  apply continuous_subtype_mk,
+  apply continuous.sub,
+  apply continuous_const,
+  apply continuous_subtype_val,
+end
 
 lemma twotimes (t:I) : t.val ≤ 0.5 -> 2*t.val ≥ 0 ∧ 2*t.val ≤ 1  := 
 begin
     intro h,
     simp,
     sorry,
+    --apply (le_div_iff zero_lt_two).mp,
 end
 
 lemma twotimesminus1 (t:I) : t.val > 0.5 -> 2*t.val-1 ≥ 0 ∧ 2*t.val-1 ≤ 1  := 
@@ -48,8 +55,15 @@ begin
     sorry,
 end
 
-lemma em_I (t : I) :¬t.val ≤ 1 / 2 -> t.val > 1 / 2 := sorry
+lemma em_I (t : I) :¬t.val ≤ 1 / 2 -> t.val > 1 / 2 := 
+begin
+  intros h,
+  sorry,
+end
 
 
 @[simp] lemma coe_of_0 : (0 : I).val = (0 : ℝ ) := rfl
 @[simp] lemma one_minus_one_coe : (1:ℝ) - (1 : I).val = (0 : ℝ ) := sub_self 1
+
+lemma not_2_lt_0 : ¬((2:ℝ)<(0:ℝ)) := sorry
+lemma not_1_lt_half: ¬ ((1 : ℝ) ≤ 2⁻¹) := sorry
