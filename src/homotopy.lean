@@ -1,6 +1,5 @@
 --- TODO : 
 --  - retirer des simps et optimiser
---  - finir l'homotopie comme équivalence
 
 import topology.basic
 import topology.algebra.continuous_functions
@@ -35,6 +34,7 @@ variable [pointed X]
 -- Dans la suite du fichier, on pointe ℝ en 0
 instance : pointed ℝ := pointed.mk 0
 
+
 --Définitions par soustype d'un chemin et d'une boucle
 /-- Chemin sur un type X -/
 def path := {f: I → X // continuous f} 
@@ -45,18 +45,19 @@ def loop := {f: I → X // continuous f ∧ f(0)=f(1) ∧ f(0) = point X  }
 def loop_homotopy (f : loop X) (g : loop X) : Prop := 
     ∃ (H : I × I -> X),  (∀ t, H(0,t) = f.val(t) ∧  H(1,t)=g.val(t)) ∧ (continuous H) 
 
-
+def test : I -> Prop := λ t,t.val≤ 0.5
 /-- Compostition de lacets -/
-noncomputable def loop_comp (f : loop X) (g : loop X) : loop X := 
-    ⟨λ t, if h:t.val≤0.5 then f.val(⟨2*t.val, twotimes t h⟩) 
-    else g.val (⟨ 2*t.val-1, twotimesminus1 t (em_I t h)⟩), 
+noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) := 
+    λ f g, ⟨λ t, ite (t.val≤0.5) (f.val(⟨2*t.val, sorry⟩) )
+        (g.val (⟨ 2*t.val-1, sorry⟩)), 
     begin 
     sorry
      end⟩
 
 
+
 /- Lacet inverse -/
-def loop_inv (f : loop X) : loop X := ⟨λ x:I, f.val(⟨1-x.val, oneminus x⟩ ), 
+def loop_inv :loop X -> loop X := λ f, ⟨λ x:I, f.val(⟨1-x.val, oneminus x⟩ ), 
       begin
       split,
         apply continuous.comp,
@@ -138,8 +139,8 @@ begin
     cases h2 with h2func h2hyp,
     -- on utilise l'homotopie H₃(t,s) = H₁(2t,s) si t ≤ 0.5
     --                                  H₂(2t-1,s) sinon
-    let H : I × I -> X := λ x, if hyp : x.1.val≤0.5 then h1func(⟨ 2*x.1.val, twotimes x.1 hyp ⟩, x.2  ) 
-        else h2func(⟨2*x.1-1, sorry⟩, x.2 ),
+    let H : I × I -> X := λ x, ite (x.1.val≤0.5) (h1func( ⟨ 2*x.1.val, sorry ⟩, x.2))
+         (h2func(⟨2*x.1.val-1, sorry⟩, x.2 )),
     use H,
     split,
 
@@ -167,8 +168,40 @@ begin
 
     -- continuité
     simp *,
+    apply continuous_if,
+    rotate,
+    -- partie 1
+    apply continuous.comp,
+    exact h1hyp.2,
+    apply continuous.prod_mk,
+    apply continuous_subtype_mk,
+    apply continuous.mul,
+    exact continuous_const,
+    apply continuous.comp,
+    exact continuous_subtype_val, -- le "relèvement" de sous-type est continu
+    exact continuous_fst, 
+    exact continuous_snd,
+    -- partie 2
+    apply continuous.comp,
+    exact h2hyp.2,
+    apply continuous.prod_mk,
+    apply continuous_subtype_mk,
+    apply continuous.sub,
+    apply continuous.mul,
+    exact continuous_const,
+    apply continuous.comp,
+    exact continuous_subtype_val, -- le "relèvement" de sous-type est continu
+    exact continuous_fst, 
+    exact continuous_const,
+    exact continuous_snd,
+    --frontière
+    intros a ha,
+    have a_def : a.fst.val=1/2, -- il faut montrer que la frontière = {1/2, -}
     sorry,
-    
+    rw a_def,
+    simp,
+    sorry,
+
 end
 
 /-- L'homotopie est une relation d'équivalence -/
@@ -178,9 +211,6 @@ theorem loop_homotopy_equiv : equivalence (loop_homotopy X) :=
 /-- Sétoïde (X, homotopies de X) -/
 definition homotopy.setoid : setoid (loop X) := { r := loop_homotopy X, iseqv := loop_homotopy_equiv X}
 
--- Tell the type class inference system about this equivalence relation.
-local attribute [instance] homotopy.setoid
-
 /-- Ensemble des classes d'homotopie -/
 definition homotopy_classes := quotient (homotopy.setoid X)
 
@@ -189,20 +219,3 @@ definition reduce_homotopy: (loop X) → homotopy_classes X := quot.mk (loop_hom
 
 -- notation à améliorer (inférer le type automatiquement)
 notation `[` f `|` X `]` := reduce_homotopy X f
-
-
-/-- La boucle constante égale à point X -/
-def const_x₀  : loop X  :=  ⟨λ x, point X, 
-        by {split, assume h,  exact continuous_const h, split, refl, refl}⟩
-
-#check [const_x₀ ℝ | ℝ] -- classe d'homotopie de l'application constante sur ℝ 
-
-/- Le groupe fondamental (à remplir) -/
-instance : group (homotopy_classes X) :=
-{ mul := _,
-  mul_assoc := _,
-  one := reduce_homotopy const_x₀,
-  one_mul := _,
-  mul_one := _,
-  inv := _,
-  mul_left_inv := _ }

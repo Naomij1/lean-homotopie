@@ -55,12 +55,6 @@ begin
     sorry,
 end
 
-lemma em_I (t : I) :¬t.val ≤ 1 / 2 -> t.val > 1 / 2 := 
-begin
-  intros h,
-  sorry,
-end
-
 
 @[simp] lemma coe_of_0 : (0 : I).val = (0 : ℝ ) := rfl
 @[simp] lemma one_minus_one_coe : (1:ℝ) - (1 : I).val = (0 : ℝ ) := sub_self 1
