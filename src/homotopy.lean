@@ -1,5 +1,6 @@
 --- TODO : 
 --  - retirer des simps et optimiser
+--  - retirer les derniers sorry (nommer les hypothèses dans ite)
 
 import topology.basic
 import topology.algebra.continuous_functions
@@ -22,7 +23,7 @@ set_option pp.beta true
 class pointed (α : Type) :=
 (point : α)
 
-/- Prends un type pointé et lui renvoit sont point base-/
+/- Prends un type pointé et lui renvoit son point base-/
 def point (α : Type) [s : pointed α] : α :=
 @pointed.point α s
 
@@ -52,19 +53,25 @@ noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) :=
         (g.val (⟨ 2*t.val-1, sorry⟩)), 
     begin 
     sorry
-     end⟩
+end⟩
 
 
 
 /- Lacet inverse -/
 def loop_inv :loop X -> loop X := λ f, ⟨λ x:I, f.val(⟨1-x.val, oneminus x⟩ ), 
-      begin
-      split,
+    begin
+    split,
         apply continuous.comp,
         exact f.property.left,
         exact oneminuscont,
-      sorry,
-      end
+    split,
+      simp,
+      symmetry,
+      exact f.property.2.1,
+      simp,
+      rw <- f.property.2.1,
+      exact f.property.2.2,
+    end
  ⟩ 
 
 
@@ -109,11 +116,9 @@ begin
     simp *, -- on déplit la définition de H_2
     simp [ coe_of_0],
     rw <- (hH.1 t).2, -- on réécrit g en H(1,t)
-    congr, -- les arguments sont égaux
     simp *, -- on déplit la définition de H_2
     simp [one_minus_one_coe],
     rw <- (hH.1 t).1, -- on réécrit f en H(0,t)
-    congr, -- les arguments sont égaux
 
     -- l'homotopie est continue
     apply continuous.comp, -- on déplit la composition
@@ -128,7 +133,6 @@ begin
     exact continuous_snd, -- la projection sur le deuxième élément est continue
 
 end
-
 
 /-- L'homotopie est transitive -/
 theorem loop_homotopy_trans : transitive (loop_homotopy X) :=
@@ -163,8 +167,9 @@ begin
         exact not_1_lt_half h_1, -- auquel cas on obtient une absurdité
     rw <- (h2hyp.1 t).2, -- soit 1>0
     congr,
-    sorry,
-
+    rw <- oneisone,
+    simp,
+    ring,
 
     -- continuité
     simp *,
@@ -197,10 +202,13 @@ begin
     --frontière
     intros a ha,
     have a_def : a.fst.val=1/2, -- il faut montrer que la frontière = {1/2, -}
-    sorry,
+    rw frontieronI at ha,
+    exact ha,
     rw a_def,
+    rw invtwo,
     simp,
-    sorry,
+    rw (h1hyp.1 a.snd).2, 
+    rw (h2hyp.1 a.snd).1,
 
 end
 

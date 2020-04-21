@@ -3,6 +3,7 @@ import data.real.basic
 import topology.instances.real
 import tactic.suggest
 
+
 open set 
 open classical
 --  Propriétés de base sur l'ensemble [0,1]
@@ -61,3 +62,20 @@ end
 
 lemma not_2_lt_0 : ¬((2:ℝ)<(0:ℝ)) := sorry
 lemma not_1_lt_half: ¬ ((1 : ℝ) ≤ 2⁻¹) := sorry
+
+
+lemma invtwo : (2:ℝ)*(1/2)=1 := sorry
+@[simp] lemma oneisone : (⟨(1:ℝ),sorry⟩:I)=(1:I):=rfl
+@[simp] lemma zeroiszero : (⟨(0:ℝ),sorry⟩:I)=(0:I):=rfl
+
+lemma frontierhalf : frontier ( Icc 0 (1/2) )= {0, (1/2)} := 
+begin
+  rw frontier,
+  rw interior_Icc 0 (1/2),
+end
+
+lemma frontieronI : frontier {a : I × I | a.fst.val ≤ 2⁻¹} = {a : I×I | a.fst.val=1/2} := 
+begin
+  have hII : is_closed (I×I), from is_closed_prod ,
+  sorry,
+end
