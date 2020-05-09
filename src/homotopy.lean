@@ -11,7 +11,8 @@ import topology.algebra.ordered
 import data.set.function
 import topology.constructions
 import tactic.split_ifs
-import topology.algebra.continuous_functions
+import tactics
+
 import misc
 
 open set topological_space 
@@ -58,7 +59,7 @@ end⟩
 
 
 /- Lacet inverse -/
-def loop_inv :loop X -> loop X := λ f, ⟨λ x:I, f.val(⟨1-x.val, oneminus x⟩ ), 
+def loop_inv : loop X -> loop X := λ f, ⟨λ x:I, f.val(⟨1-x.val, oneminus x⟩ ), 
     begin
     split,
         apply continuous.comp,
