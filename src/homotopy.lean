@@ -79,8 +79,7 @@ def loop_inv : loop X -> loop X := λ f, ⟨λ x:I, f.val(⟨1-x.val, oneminus x
 /-- L'homotopie est reflexive -/
 theorem loop_homotopy_refl : reflexive (loop_homotopy X) :=
 begin
-    intros,
-    assume f,
+    intro f,
     -- on utilise l'homotopie H(t,s) = f(s)
     let H : I × I -> X := λ x, f.val (x.2), 
     use H,
@@ -94,7 +93,6 @@ begin
     -- l'homotopie est continue
     apply continuous.comp, -- on déplit la composition
     exact f.property.left, -- f est continue
-    simp,
     exact continuous_snd, -- la projection sur le deuxième élément est continue
 end
 
@@ -103,7 +101,7 @@ end
 /-- L'homotopie est symmétrique -/
 theorem loop_homotopy_symm : symmetric (loop_homotopy X) :=
 begin
-    assume f g,
+    intros f g,
     intro h1, 
     cases h1 with H hH,
     -- on utilise l'homotopie H_2(t,s) = H(1-t,s)
@@ -116,10 +114,10 @@ begin
     split,
     simp *, -- on déplit la définition de H_2
     simp [ coe_of_0],
-    rw <- (hH.1 t).2, -- on réécrit g en H(1,t)
+    rw (hH.1 t).2, -- on réécrit g en H(1,t)
     simp *, -- on déplit la définition de H_2
     simp [one_minus_one_coe],
-    rw <- (hH.1 t).1, -- on réécrit f en H(0,t)
+    rw  (hH.1 t).1, -- on réécrit f en H(0,t)
 
     -- l'homotopie est continue
     apply continuous.comp, -- on déplit la composition
@@ -138,14 +136,14 @@ end
 /-- L'homotopie est transitive -/
 theorem loop_homotopy_trans : transitive (loop_homotopy X) :=
 begin
-    assume f g h,
+    intros f g h,
     intros h1 h2,
     cases h1 with h1func h1hyp,
     cases h2 with h2func h2hyp,
     -- on utilise l'homotopie H₃(t,s) = H₁(2t,s) si t ≤ 0.5
     --                                  H₂(2t-1,s) sinon
     let H : I × I -> X := λ x, ite (x.1.val≤0.5) (h1func( ⟨ 2*x.1.val, sorry ⟩, x.2))
-         (h2func(⟨2*x.1.val-1, sorry⟩, x.2 )),
+         (h2func(⟨2*x.1.val-1, sorry⟩, x.2 )),  
     use H,
     split,
 
@@ -154,7 +152,7 @@ begin
     split,
     simp *,
     split_ifs, -- on déplit la définition d'une condition
-        rw <- (h1hyp.1 t).1, -- soit 0<1/2
+        rw <- (h1hyp.1 t).1, -- soit 0≤1/2
         congr,
         simp [coe_of_0], -- auquel cas les deux arguments sont égaux
     simp at h_1, -- soit 2<0

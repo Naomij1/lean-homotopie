@@ -7,7 +7,9 @@ variable X:Type
 variable [topological_space X] 
 variable [pointed X] 
 
+-- On demande à Lean de β-réduire les expressions automatiquement
 set_option pp.beta true
+
 -- Lean infère automatiquement que ≈ fait référence à l'homotopie
 local attribute [instance] homotopy.setoid
 
@@ -38,23 +40,26 @@ lemma congr_inv (f₁ f₂ : loop X) : f₁≈f₂ -> [loop_inv X f₁ | X ] = [
 begin
     intro h,
     cases h with H1 H1_hyp,
-    apply quotient.sound,
+    apply quotient.sound, -- démontrer que les classes d'équivalence sont égales, c'est démontrer 
+                          -- qu'il existe une homotopie entre les représentants
     let H : I × I -> X := λ x, H1 (x.1, ⟨ 1-x.2.val, oneminus x.2 ⟩),
     use H,
     split,
 
+    -- l'homotopie vaut \bar{f₁} et \bar{f₂} aux extrémités
     intro t,
     split,
     rw loop_inv,
     simp,
-    rw <- (H1_hyp.1 ⟨1-t.val, oneminus t ⟩ ).1,
+    rw <- (H1_hyp.1 ⟨1-t.val, oneminus t ⟩ ).1, -- le typage dépend de la démonstration
     rw loop_inv,
     simp,
     rw <- (H1_hyp.1 ⟨1-t.val, oneminus t ⟩ ).2,
 
+    -- l'homotopie est continue
     apply continuous.comp,
     exact H1_hyp.2,
-    cont 1,
+    cont 1, -- tactique définie dans le fichier tactics.lean
     apply continuous_subtype_mk,
     apply continuous.sub,
     cont 1,
@@ -68,50 +73,53 @@ set_option trace.check true
 theorem const_comp :  ∀ (a : homotopy_classes X), homotopy.comp X [const_x₀ X | X] a = a :=
 begin
     intros f_quot,
-    apply quotient.induction_on f_quot,
-    intro f,
+    apply quotient.induction_on f_quot, -- transforme en un résultat pour un lacet f quelqconque
+    intro f, -- soit f un tel lacet
     let H : I × I -> X := λ x, ite (x.2.val≤(1-x.1.val)/2) (point X) (f.val(⟨(2-x.1.val)*x.2.val-1+x.1.val,sorry ⟩)), 
-    apply quotient.sound,
+    apply quotient.sound, -- on va montrer que H est une homotopie entre c₀⬝f et f
     use H,
     split,
 
+    -- l'homotopie vaut c₀⬝f et f aux extrémités, découpées en 6 parties par split_ifs
     intro t,
     split,
     rw loop_comp,
     simp,
     split_ifs,
+    
     simp *,
     split_ifs,
-    simp at h_1,
+    simp at h_1, -- partie 1
     rw const_x₀,
     simp at h_1,
-    exfalso,
+    exfalso, -- partie 2
+      linarith, -- linarith détecte l'aspect absurde des hypothèses et conclue immédiatement
+
+    simp *, 
+    split_ifs,
+    simp at h_1,
+    exfalso, -- partie 3
       linarith,
+    simp at h, -- partie 4
+    simp at h_1,
+    simp *,
 
     simp *,
     split_ifs,
-    simp at h_1,
-    exfalso,
-      linarith,
-    simp at h,
-    simp at h_1,
-    simp *,
-
-    simp *,
-    split_ifs,
-    simp at h,
+    simp at h, -- partie 5
     have ht : t.val=(0:I).val, from antisymm h t.property.1,
-    have ht' : t=0, from  subtype.eq ht,
+    have ht' : t=0, from  subtype.eq ht, -- on "projette" sur le sous-type
     rw ht',
     rw f.property.2.2,
 
-    simp at h,
+    simp at h, -- partie 6
     simp *,
     congr,
     apply subtype.eq',
     simp *,
-    ring,
+    ring,  -- découle des propriétés dans un anneau
     
+    -- l'homotopie est continue
     apply continuous_if,
     rotate,
     exact continuous_const,
@@ -128,6 +136,7 @@ begin
     exact continuous_fst,
     apply continuous.comp,
     cont 0,
+    -- valeur à la frontière
     sorry,
 end
 /- [f⬝c₀] = [f]-/
@@ -194,13 +203,13 @@ end
 
 /- Le groupe fondamental (à remplir) -/
 noncomputable instance : group (homotopy_classes X) :=
-{ mul := homotopy.comp X, 
-  mul_assoc := by sorry,
-  one := [const_x₀ X | X],
-  one_mul := const_comp X,
-  mul_one := comp_const X, 
-  inv := homotopy.inv X,
-  mul_left_inv := by sorry }
+{ mul := homotopy.comp X, -- loi de composition interne
+  mul_assoc := by sorry, -- associativité
+  one := [const_x₀ X | X], -- élément neutre
+  one_mul := const_comp X, -- l'élément neutre est neutre à gauche
+  mul_one := comp_const X, -- l'élément neutre est neutre à droite
+  inv := homotopy.inv X, -- inverse
+  mul_left_inv := by sorry } -- l'inverse donne le neutre à gauche 
 
 def trivial  : Prop := ∀ f:loop X, [f|X]=[const_x₀ X|X]
 

@@ -16,15 +16,13 @@ instance : has_one I := ⟨⟨1, and.intro (zero_le_one) (le_refl 1)⟩⟩
 noncomputable def real_to_I (x : ℝ) : I := if h : x≥0 ∧ x≤1 then ⟨x, h⟩ else (0 : I)
 instance : has_coe I ℝ := ⟨subtype.val⟩
 instance : has_le I := ⟨λ r s, (r:ℝ) ≤ s⟩
-instance : inhabited I := ⟨0⟩ 
---instance : has_div I := ⟨λ x y, real_to_I (x/y) ⟩
 noncomputable instance : has_sub I := ⟨λ a b, real_to_I (a-b)⟩ 
 
 lemma oneminus (t : I) : 1-t.val ≥ 0 ∧ 1-t.val ≤ 1 :=
 begin
   simp,
   split,
-  exact t.property.right,
+  exact t.property.2,
   ring,
   apply add_le_iff_nonpos_left.mpr,
   apply neg_le.mp,
@@ -64,8 +62,8 @@ lemma not_2_lt_0 : ¬((2:ℝ)<(0:ℝ)) := by {intro,  linarith}
 lemma not_1_lt_half: ¬ ((1 : ℝ) ≤ 2⁻¹) := sorry
 
 
-lemma invtwo : (2:ℝ)*(1/2)=1 := sorry
-lemma invtwo'  (x:ℝ) :((2:ℝ)*x)/2=x := sorry
+lemma invtwo : (2:ℝ)*(1/2)=1 := by ring
+lemma invtwo'  (x:ℝ) :((2:ℝ)*x)/2=x := by ring
 
 @[simp] lemma oneisone : (⟨(1:ℝ),sorry⟩:I)=(1:I):=rfl
 @[simp] lemma zeroiszero : (⟨(0:ℝ),sorry⟩:I)=(0:I):=rfl
