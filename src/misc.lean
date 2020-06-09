@@ -2,7 +2,7 @@ import data.set.intervals.basic
 import data.real.basic
 import topology.instances.real
 import tactic.suggest
-
+import tactics
 
 open set 
 open classical
@@ -50,7 +50,10 @@ lemma twotimesminus1 (t:I) : t.val > 0.5 -> 2*t.val-1 ≥ 0 ∧ 2*t.val-1 ≤ 1 
 begin
     intro h,
     simp,
-    sorry,
+    split,
+    linarith,
+    have h2 : t.val ≤ 1, from t.property.2,
+    linarith,
 end
 
 
@@ -68,12 +71,39 @@ lemma invtwo'  (x:ℝ) :((2:ℝ)*x)/2=x := by ring
 @[simp] lemma oneisone : (⟨(1:ℝ),sorry⟩:I)=(1:I):=rfl
 @[simp] lemma zeroiszero : (⟨(0:ℝ),sorry⟩:I)=(0:I):=rfl
 
-lemma frontierhalf : frontier ( Icc 0 (1/2) )= {0, (1/2)} := 
+def f_aux : I×I->I := λ x, x.1
+
+lemma cont_f_aux : continuous f_aux := by {cont 0}
+
+lemma frontieronI' : frontier {a : ↥I | a.val ≤ 1 / 2} = {a : I | a.val=1/2}  := by sorry
+lemma frontieronI : frontier  ({a : I × I | a.fst.val ≤ 2⁻¹} : set (I×I)) = {a : I×I | a.fst.val=1/2} := 
 begin
-  sorry
+  have  test : is_closed {a : I × I | a.fst.val ≤ 2⁻¹}, from sorry,
+  have interior2 : interior {a : I × I | a.fst.val ≤ 2⁻¹} = {a : I × I | a.fst.val < 2⁻¹} , from sorry,
+  simp [test, is_closed.frontier_eq, interior2],
+  ext,
+  split,
+  intro h,
+  cases h with h1 h2,
+  simp [mem_def] at h1,
+  simp [mem_def] at h2,
+  simp *,
+  linarith,
+
+  intro h,
+  simp *,
+  simp [mem_def] at h,
+  split,
+  linarith,
+  linarith,
 end
 
-lemma frontieronI : frontier {a : I × I | a.fst.val ≤ 2⁻¹} = {a : I×I | a.fst.val=1/2} := 
+lemma in_I_const_comp  (x : I×I) : 0≤(2-x.1.val)*x.2.val-1 + x.1.val ∧ (2-x.1.val)*x.2.val-1 + x.1.val≤1:= 
 begin
-  sorry,
+ sorry
 end
+
+lemma in_I_comp_const  (x : I×I) : 0≤(2-x.1.val)*x.2.val ∧ (2-x.1.val)*x.2.val ≤ 1 := by sorry
+
+lemma one_half : (1 + 1) / (4:ℝ) = 1/2 := by ring
+lemma one_quarter : (1 + 0) / (4:ℝ) = 1/4 := by ring

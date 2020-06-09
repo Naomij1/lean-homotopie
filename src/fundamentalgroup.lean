@@ -27,6 +27,11 @@ def const_x₀  : loop X  :=  ⟨λ x, point X,
 lemma congr_comp (f₁ f₂ g₁ g₂ : loop X) : f₁≈f₂ -> g₁≈g₂
         ->  [loop_comp X f₁ g₁ | X] = [loop_comp X f₂ g₂ | X] :=
     begin
+    intros h1 h2,
+    cases h1 with H1 H1_hyp,
+    cases h2 with H2 H2_hyp,
+    apply quotient.sound, 
+    let H : I × I -> X := λ x, H1 (x.1, ⟨ 1-x.2.val, oneminus x.2 ⟩),
   sorry
 end
 
@@ -67,7 +72,6 @@ end
 /- L'inverse d'une classe d'homotopie de lacets-/
 protected definition inv : homotopy_classes X  → homotopy_classes X :=
 quotient.lift (λ f : loop X, [loop_inv X f  | X] ) (λ  f₁ f₂ h , congr_inv X f₁  f₂ h)
-set_option trace.check true
 
 /- [c₀⬝f] = [f]-/
 theorem const_comp :  ∀ (a : homotopy_classes X), homotopy.comp X [const_x₀ X | X] a = a :=
@@ -75,7 +79,8 @@ begin
     intros f_quot,
     apply quotient.induction_on f_quot, -- transforme en un résultat pour un lacet f quelqconque
     intro f, -- soit f un tel lacet
-    let H : I × I -> X := λ x, ite (x.2.val≤(1-x.1.val)/2) (point X) (f.val(⟨(2-x.1.val)*x.2.val-1+x.1.val,sorry ⟩)), 
+    let H : I × I -> X := λ x, ite (x.2.val≤(1-x.1.val)/2) (point X) 
+                                   (f.val(⟨(2-x.1.val)*x.2.val-1+x.1.val,in_I_const_comp x⟩)), 
     apply quotient.sound, -- on va montrer que H est une homotopie entre c₀⬝f et f
     use H,
     split,
@@ -136,6 +141,7 @@ begin
     exact continuous_fst,
     apply continuous.comp,
     cont 0,
+
     -- valeur à la frontière
     sorry,
 end
@@ -145,7 +151,8 @@ begin
     intros f_quot,
     apply quotient.induction_on f_quot,
     intro f,
-    let H : I × I -> X := λ x, ite (x.2.val<=(1+x.1.val)/2) (f.val(⟨(2-x.1.val)*x.2.val,sorry ⟩)) (point X) , 
+    let H : I × I -> X := λ x, ite (x.2.val<=(1+x.1.val)/2) (f.val(⟨(2-x.1.val)*x.2.val,in_I_comp_const x⟩))
+                                   (point X), 
     apply quotient.sound,
     use H,
     split,
@@ -201,24 +208,119 @@ begin
     sorry,
 end
 
-/- Le groupe fondamental (à remplir) -/
+
+theorem comp_assoc : ∀ (a b c : homotopy_classes X), (homotopy.comp X (homotopy.comp X a b) c) = homotopy.comp X a (homotopy.comp X b c) :=
+begin
+  intros,
+  apply quotient.induction_on a,
+  apply quotient.induction_on b,
+  apply quotient.induction_on c,
+  intros h g f,
+  apply quotient.sound,
+  -- s, t
+  let H : I × I -> X := λ x, ite (x.2.val<=(1+x.1.val)/2) ( ite (x.2.val<=(1+x.1.val)/4) (f.val((⟨4*x.2.val/(x.1.val+1), sorry⟩))) (g.val(⟨4*x.2.val-x.1.val-1, sorry ⟩)) )
+                                   (h.val(⟨(4*x.2.val-x.1.val-2)/(2-x.1), sorry ⟩)), 
+  use H,
+  split,
+  intro t,
+
+  split,
+  rw loop_comp,
+  simp *,
+  split_ifs,
+  simp * at *,
+  congr' 1, -- pas d'identification trop enthousiaste
+  apply subtype.eq',
+  ring at |-,
+  ring at |-,
+
+  simp * at *,
+  exfalso,
+  sorry,
+
+  simp * at *,
+
+  simp * at *,
+  exfalso,
+  sorry,
+
+  simp * at *,
+  congr' 1,
+  apply subtype.eq',
+  ring at |-,
+  ring at |-,
+
+  simp * at *,
+  simp * at h_1,
+  exfalso,
+  exact h_1,
+  
+  simp * at *,
+  congr,
+  sorry,
+
+  rw loop_comp,
+  simp *,
+  split_ifs,
+
+  congr,
+  sorry,
+
+  exfalso,
+  simp * at *,
+  sorry,
+
+  exfalso,
+  simp * at *,
+  sorry,
+
+  simp * at *,
+  rw one_half at h_2, 
+  simp at h_2,
+  exfalso,
+  linarith,
+
+  congr,
+  simp *,
+  ring at |-,
+
+  exfalso,
+  sorry,
+
+  exfalso,
+  simp * at *,
+  sorry,
+
+  exfalso,
+  simp * at *,
+  linarith,
+
+  congr,
+  sorry,
+
+  sorry,
+end
+/- Le groupe fondamental -/
 noncomputable instance : group (homotopy_classes X) :=
 { mul := homotopy.comp X, -- loi de composition interne
-  mul_assoc := by sorry, -- associativité
+  mul_assoc := comp_assoc X, -- associativité
   one := [const_x₀ X | X], -- élément neutre
   one_mul := const_comp X, -- l'élément neutre est neutre à gauche
   mul_one := comp_const X, -- l'élément neutre est neutre à droite
   inv := homotopy.inv X, -- inverse
   mul_left_inv := by sorry } -- l'inverse donne le neutre à gauche 
 
-def trivial  : Prop := ∀ f:loop X, [f|X]=[const_x₀ X|X]
+/- Une définition possible d'un groupe trivial  -/
+def trivial (G) [group G]: Prop := ∀ f:G , f=1
 
 /- π₁(ℝ,0) est trivial-/
-example : trivial ℝ :=
+example : trivial ( homotopy_classes ℝ) :=
 begin
-  intro,
+  intros f_quot,
+  apply quotient.induction_on f_quot,
+  intro f,
   apply quotient.sound,
-  let H : I×I -> ℝ :=λ x, (1-x.1.val)*f.val(x.2)+x.1.val*(const_x₀ ℝ).val(x.2),
+  let H : I×I -> ℝ := λ x, (1-x.1.val)*f.val(x.2)+x.1.val*(const_x₀ ℝ).val(x.2),
   use H,
   split,
   intro t,

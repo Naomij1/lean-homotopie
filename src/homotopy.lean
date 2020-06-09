@@ -47,13 +47,67 @@ def loop := {f: I → X // continuous f ∧ f(0)=f(1) ∧ f(0) = point X  }
 def loop_homotopy (f : loop X) (g : loop X) : Prop := 
     ∃ (H : I × I -> X),  (∀ t, H(0,t) = f.val(t) ∧  H(1,t)=g.val(t)) ∧ (continuous H) 
 
-def test : I -> Prop := λ t,t.val≤ 0.5
+
 /-- Compostition de lacets -/
 noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) := 
     λ f g, ⟨λ t, ite (t.val≤0.5) (f.val(⟨2*t.val, sorry⟩) )
         (g.val (⟨ 2*t.val-1, sorry⟩)), 
     begin 
-    sorry
+    split, 
+    apply continuous_if,
+    rotate,
+    apply continuous.comp,
+    exact f.property.1,
+    apply continuous_subtype_mk,
+    apply continuous.mul,
+    exact continuous_const,
+    apply continuous_subtype_val,
+    apply continuous.comp,
+    exact g.property.1,
+    apply continuous_subtype_mk,
+    apply continuous.add,
+    apply continuous.mul,
+    exact continuous_const,
+    apply continuous_subtype_val,
+    exact continuous_const,
+
+    split_ifs,
+    simp at h_1,
+    exfalso,
+    sorry,
+
+    split,
+    simp,
+    rw f.property.2.2,
+    conv {to_lhs,
+    rw <- g.property.2.2, 
+    rw g.property.2.1,},
+    congr,
+    apply subtype.eq',
+    simp,
+    ring,
+
+    simp,
+    rw f.property.2.2,
+
+    exfalso,
+    simp at h,
+    linarith,
+
+    exfalso,
+    simp at h,
+    linarith,
+
+    intros a ha,
+    have a_def : a.val=1/2, -- il faut montrer que la frontière = {1/2, -}
+    rw frontieronI' at ha,
+    exact ha,
+    rw a_def,
+    rw invtwo,
+    simp,
+    rw g.property.2.2, 
+    rw <- f.property.2.1,
+    rw f.property.2.2,
 end⟩
 
 

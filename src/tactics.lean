@@ -60,9 +60,9 @@ meta def cont : nat -> tactic unit
      
 
 
-def f: ℝ × ℝ -> ℝ× ℝ:= λ x, (x.1+x.2,x.2)
+--def f: ℝ × ℝ -> ℝ× ℝ:= λ x, (x.1+x.2,x.2)
 
-example : continuous f := 
-begin
-    cont 3,
-end
+--example : continuous f := 
+--begin
+    --cont 3,
+--end
