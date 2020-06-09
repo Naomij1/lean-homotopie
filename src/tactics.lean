@@ -33,8 +33,9 @@ meta def finish : list expr -> tactic unit
       tactic.skip,
       finish hs
    }
--- ?????
-meta def trash : tactic unit := do
+
+
+meta def elaborate : tactic unit := do
 { applyc' ``continuous.prod_mk  <|> applyc' ``continuous_subtype_mk <|> applyc' ``continuous.sub 
                       <|> applyc' ``continuous.add
                       <|> applyc' ``continuous.comp 
@@ -44,7 +45,7 @@ meta def elaborate_cont : nat -> tactic unit
 | 0 := tactic.skip
 | (n+1) := do{
     --trié par priorité
-    tactic.any_goals trash<|>
+    tactic.any_goals elaborate<|>
     tactic.skip,
     elaborate_cont n}
    -- élabore le plus possible toutes les continuités nécessaires, puis les résout avec finish

@@ -99,7 +99,7 @@ noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) :=
     linarith,
 
     intros a ha,
-    have a_def : a.val=1/2, -- il faut montrer que la frontière = {1/2, -}
+    have a_def : a.val=1/2, -- il faut montrer que la frontière = {1/2}
     rw frontieronI' at ha,
     exact ha,
     rw a_def,
