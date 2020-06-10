@@ -30,13 +30,6 @@ begin
   exact t.property.1,
 end
 
-lemma oneminuscont : continuous (λ t:I, (⟨1-t, oneminus t⟩:I)) := 
-begin
-  apply continuous_subtype_mk,
-  apply continuous.sub,
-  apply continuous_const,
-  apply continuous_subtype_val,
-end
 
 lemma twotimes (t:I) : t.val ≤ 0.5 -> 2*t.val ≥ 0 ∧ 2*t.val ≤ 1  := 
 begin
@@ -62,7 +55,7 @@ end
 @[simp] lemma one_minus_one_coe : (1:ℝ) - (1 : I).val = (0 : ℝ ) := sub_self 1
 
 lemma not_2_lt_0 : ¬((2:ℝ)<(0:ℝ)) := by {intro,  linarith}
-lemma not_1_lt_half: ¬ ((1 : ℝ) ≤ 2⁻¹) := sorry
+lemma not_1_lt_half: ¬ ((1 : ℝ) ≤ 2⁻¹) :=  by sorry
 
 
 lemma invtwo : (2:ℝ)*(1/2)=1 := by ring
@@ -71,9 +64,6 @@ lemma invtwo'  (x:ℝ) :((2:ℝ)*x)/2=x := by ring
 @[simp] lemma oneisone : (⟨(1:ℝ),sorry⟩:I)=(1:I):=rfl
 @[simp] lemma zeroiszero : (⟨(0:ℝ),sorry⟩:I)=(0:I):=rfl
 
-def f_aux : I×I->I := λ x, x.1
-
-lemma cont_f_aux : continuous f_aux := by {cont 0}
 
 lemma frontieronI' : frontier {a : ↥I | a.val ≤ 1 / 2} = {a : I | a.val=1/2}  := by sorry
 lemma frontieronI : frontier  ({a : I × I | a.fst.val ≤ 2⁻¹} : set (I×I)) = {a : I×I | a.fst.val=1/2} := 

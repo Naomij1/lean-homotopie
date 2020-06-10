@@ -54,8 +54,11 @@ noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) :=
         (g.val (⟨ 2*t.val-1, sorry⟩)), 
     begin 
     split, 
+
+    -- on doit montrer que la compositions de lacets est un lacet
+    -- on commence par la continuité
     apply continuous_if,
-    rotate,
+    rotate, -- on relègue la preuve de la frontière à la fin
     apply continuous.comp,
     exact f.property.1,
     apply continuous_subtype_mk,
@@ -71,6 +74,7 @@ noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) :=
     apply continuous_subtype_val,
     exact continuous_const,
 
+    -- le lacet vaut bien x₀ aux extrémités
     split_ifs,
     simp at h_1,
     exfalso,
@@ -79,13 +83,13 @@ noncomputable def loop_comp : (loop X ) -> (loop X) -> (loop X) :=
     split,
     simp,
     rw f.property.2.2,
-    conv {to_lhs,
+    conv {to_lhs,   -- conv permet de travailler dans le membre de gauche
     rw <- g.property.2.2, 
     rw g.property.2.1,},
     congr,
-    apply subtype.eq',
+    apply subtype.eq', -- on "relève" l'égalité dans le type ambiant
     simp,
-    ring,
+    ring, -- découle des propriétés dans un anneau
 
     simp,
     rw f.property.2.2,
@@ -118,7 +122,10 @@ def loop_inv : loop X -> loop X := λ f, ⟨λ x:I, f.val(⟨1-x.val, oneminus x
     split,
         apply continuous.comp,
         exact f.property.left,
-        exact oneminuscont,
+        apply continuous_subtype_mk,
+        apply continuous.sub,
+        apply continuous_const,
+        apply continuous_subtype_val,,
     split,
       simp,
       symmetry,

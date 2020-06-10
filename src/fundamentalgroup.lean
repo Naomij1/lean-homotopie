@@ -208,7 +208,7 @@ begin
     sorry,
 end
 
-
+/- associativité de la composition -/
 theorem comp_assoc : ∀ (a b c : homotopy_classes X), (homotopy.comp X (homotopy.comp X a b) c) = homotopy.comp X a (homotopy.comp X b c) :=
 begin
   intros,
@@ -217,7 +217,7 @@ begin
   apply quotient.induction_on c,
   intros h g f,
   apply quotient.sound,
-  -- s, t
+  -- l'homotopie nécessaire
   let H : I × I -> X := λ x, ite (x.2.val<=(1+x.1.val)/2) ( ite (x.2.val<=(1+x.1.val)/4) (f.val((⟨4*x.2.val/(x.1.val+1), sorry⟩))) (g.val(⟨4*x.2.val-x.1.val-1, sorry ⟩)) )
                                    (h.val(⟨(4*x.2.val-x.1.val-2)/(2-x.1), sorry ⟩)), 
   use H,
@@ -227,7 +227,7 @@ begin
   split,
   rw loop_comp,
   simp *,
-  split_ifs,
+  split_ifs, -- on découpe la preuve en 20
   simp * at *,
   congr' 1, -- pas d'identification trop enthousiaste
   apply subtype.eq',
